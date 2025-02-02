@@ -9,6 +9,7 @@ let gameMode = "normal";
 let moveCooldown = false;
 let cooldownTime = 3;
 let activeEffects = [];
+let leaderboard = JSON.parse(localStorage.getItem("leaderboard")) || [];
 
 const events = [
     { text: "Sherand skips you! You move back a spot.", effect: 1 },
@@ -23,20 +24,6 @@ const events = [
     { text: "A raffle winner is announced! Someone skips 5 spots!", effect: "raffle" },
     { text: "A prefect catches you! You are sent to the back!", effect: 10 }
 ];
-
-const shopItems = {
-    bribe: { cost: 25, effect: -2, description: "Move forward 2 spots." },
-    emergency: { cost: 50, effect: -5, description: "Move forward 5 spots." },
-    stopWalter: { cost: 75, effect: "removeWalter", description: "Stops Walter from buying all the food!" },
-    teacher: { cost: 100, effect: "teacher", description: "Move to position 2 instantly!" },
-    lunchPass: { cost: 150, effect: "front", description: "Skip to the front of the line!" },
-    securityBribe: { cost: 80, effect: "blockSkips", description: "Prevents people from skipping you for 5 turns." },
-    fakePass: { cost: 50, effect: "fakePass", description: "50% chance to move forward 3 spots, else move back 5 spots." },
-    sneakyFriend: { cost: 40, effect: -1, description: "Move forward 1 spot." },
-    speedBoost: { cost: 30, effect: "doubleMove", description: "Move twice as fast for 3 turns." },
-    stealthMode: { cost: 60, effect: "stealth", description: "Avoid all negative events for 2 turns." },
-    chaosMode: { cost: 90, effect: "chaos", description: "Reverse all events for 3 turns." }
-};
 
 function startGame() {
     playerName = document.getElementById("player-name").value || "Player";
@@ -53,6 +40,7 @@ function startGame() {
     document.getElementById("game-screen").style.display = "block";
     document.getElementById("display-name").innerText = playerName;
 
+    loadPlayerStats();
     updateUI();
 }
 
@@ -106,18 +94,66 @@ function attemptMove() {
 
     if (position === 1) {
         wins++;
+        savePlayerStats();
+        updateLeaderboard(playerName, wins);
         document.getElementById("story").innerText = playerName + " reached the front! You win!";
         gameOver = true;
     }
 }
 
+function updateLeaderboard(name, winCount) {
+    let player = leaderboard.find(p => p.name === name);
+    if (player) {
+        player.wins++;
+        player.bestStreak = Math.max(player.bestStreak, player.wins);
+        player.attempts += attempts;
+    } else {
+        leaderboard.push({ name, wins: winCount, bestStreak: winCount, attempts });
+    }
+
+    leaderboard.sort((a, b) => b.wins - a.wins);
+    localStorage.setItem("leaderboard", JSON.stringify(leaderboard));
+    displayLeaderboard();
+}
+
+function displayLeaderboard() {
+    let leaderboardBody = document.getElementById("leaderboard-body");
+    leaderboardBody.innerHTML = "";
+    leaderboard.forEach(player => {
+        leaderboardBody.innerHTML += `<tr><td>${player.name}</td><td>${player.wins}</td><td>${player.bestStreak}</td><td>${player.attempts}</td></tr>`;
+    });
+}
+
+function savePlayerStats() {
+    localStorage.setItem(playerName, JSON.stringify({ wins, attempts }));
+}
+
+function loadPlayerStats() {
+    let savedStats = JSON.parse(localStorage.getItem(playerName));
+    if (savedStats) {
+        wins = savedStats.wins;
+        attempts = savedStats.attempts;
+    }
+    displayLeaderboard();
+}
+
+function updateUI() {
+    document.getElementById("position").innerText = position;
+    document.getElementById("coins").innerText = coins;
+    document.getElementById("stamina").innerText = stamina;
+    document.getElementById("attempts").innerText = attempts;
+    document.getElementById("wins").innerText = wins;
+    document.getElementById("progress-bar").style.width = ((10 - position) / 10) * 100 + "%";
+}
+
+/* SHOP SYSTEM */
 function toggleShop() {
     let shop = document.getElementById("shop");
     shop.style.display = (shop.style.display === "none" || shop.style.display === "") ? "block" : "none";
 }
 
 function buyItem(item) {
-    if (moveCooldown || !shopItems[item]) return;
+    if (!shopItems[item]) return;
 
     let itemData = shopItems[item];
 
@@ -130,53 +166,27 @@ function buyItem(item) {
 
     if (typeof itemData.effect === "number") {
         position += itemData.effect;
-    } else {
-        if (itemData.effect === "removeWalter") {
-            events = events.filter(e => !e.text.includes("Walter buys"));
-        } else if (itemData.effect === "teacher") {
-            position = 2;
-        } else if (itemData.effect === "front") {
-            position = 1;
-        } else if (itemData.effect === "blockSkips") {
-            events = events.filter(e => !e.text.includes("skips"));
-        } else if (itemData.effect === "fakePass") {
-            if (Math.random() < 0.5) {
-                position -= 3;
-            } else {
-                position += 5;
-            }
-        } else if (itemData.effect === "doubleMove") {
-            activeEffects.push("Speed Boost (3 turns)");
-        } else if (itemData.effect === "stealth") {
-            activeEffects.push("Stealth Mode (2 turns)");
-        } else if (itemData.effect === "chaos") {
-            events = events.map(e => ({ ...e, effect: e.effect * -1 }));
-            activeEffects.push("Chaos Mode (3 turns)");
-        }
+    } else if (itemData.effect === "teacher") {
+        position = 2;
+    } else if (itemData.effect === "front") {
+        position = 1;
+    } else if (itemData.effect === "blockSkips") {
+        events = events.filter(e => !e.text.includes("skips"));
+    } else if (itemData.effect === "doubleMove") {
+        activeEffects.push("Speed Boost (3 turns)");
+    } else if (itemData.effect === "stealth") {
+        activeEffects.push("Stealth Mode (2 turns)");
     }
-
-    if (position < 1) position = 1;
 
     updateUI();
     showNotification(`Purchased: ${itemData.description}`, "green");
 }
 
+/* NOTIFICATIONS */
 function showNotification(message, color) {
     let notification = document.getElementById("purchase-notification");
     notification.innerText = message;
     notification.style.background = color;
     notification.style.display = "block";
     setTimeout(() => { notification.style.display = "none"; }, 2000);
-}
-
-function updateUI() {
-    document.getElementById("position").innerText = position;
-    document.getElementById("coins").innerText = coins;
-    document.getElementById("stamina").innerText = stamina;
-    document.getElementById("attempts").innerText = attempts;
-    document.getElementById("wins").innerText = wins;
-    document.getElementById("progress-bar").style.width = ((10 - position) / 10) * 100 + "%";
-    document.getElementById("effects-list").innerHTML = activeEffects.length > 0 
-        ? activeEffects.map(effect => `<li>${effect}</li>`).join("") 
-        : "<li>No active effects.</li>";
 }
