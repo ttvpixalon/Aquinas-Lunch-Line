@@ -10,15 +10,13 @@
     <div id="game-container">
         <h1>Aquinas College Lunch Line Challenge</h1>
 
-        <!-- Update Log (Now Visible Before Starting the Game) -->
+        <!-- Update Log -->
         <div id="update-log">
             <h2>Update Log</h2>
             <ul>
-                <li><strong>v3.0</strong> (Latest) - Added <em>Leaderboard, More Shop Items, Power-Ups, Game Modes, & Random Events</em>.</li>
-                <li><strong>v2.5</strong> - Introduced <em>Stamina System & Price Inflation Event</em>.</li>
-                <li><strong>v2.0</strong> - Implemented <em>Shop System & Major UI Improvements</em>.</li>
-                <li><strong>v1.5</strong> - Balanced <em>Skipping & Random Events</em>.</li>
-                <li><strong>v1.0</strong> - Initial release of the <em>Aquinas College Lunch Line Challenge</em>.</li>
+                <li><strong>v3.1</strong> (Latest) - **Revamped Shop UI & Added Status Effect Panel**.</li>
+                <li><strong>v3.0</strong> - Added **Leaderboard, More Shop Items, Power-Ups, & Game Modes**.</li>
+                <li><strong>v2.5</strong> - Introduced **Stamina System & Price Inflation Event**.</li>
             </ul>
         </div>
 
@@ -55,6 +53,14 @@
                 <p><strong>Wins:</strong> <span id="wins">0</span></p>
             </div>
 
+            <!-- Active Status Effects -->
+            <div id="status-effects">
+                <h2>Active Effects</h2>
+                <ul id="effects-list">
+                    <li>No active effects.</li>
+                </ul>
+            </div>
+
             <!-- Leaderboard -->
             <div id="leaderboard">
                 <h2>Leaderboard</h2>
@@ -77,26 +83,31 @@
 
             <div id="choices">
                 <button class="game-btn" onclick="attemptMove()">Move Forward</button>
-                <button class="game-btn" onclick="openShop()">Shop</button>
+                <button class="game-btn" onclick="toggleShop()">Shop</button>
                 <button class="game-btn give-up" onclick="giveUp()">Give Up</button>
             </div>
 
-            <!-- Shop System -->
+            <!-- New Shop Layout -->
             <div id="shop" style="display: none;">
                 <h2>Shop</h2>
-                <p><button class="shop-btn" onclick="buyItem('bribe')">Bribe a Senior (25 coins)</button></p>
-                <p><button class="shop-btn" onclick="buyItem('emergency')">Fake Emergency (50 coins)</button></p>
-                <p><button class="shop-btn" onclick="buyItem('stopWalter')">Buy Off Walter (75 coins)</button></p>
-                <p><button class="shop-btn" onclick="buyItem('teacher')">This is for a teacher (100 coins)</button></p>
-                <p><button class="shop-btn" onclick="buyItem('lunchPass')">Lunch Pass (150 coins)</button></p>
-                <p><button class="shop-btn" onclick="buyItem('securityBribe')">Security Bribe (80 coins)</button></p>
-                <p><button class="shop-btn" onclick="buyItem('fakePass')">Fake Hall Pass (50 coins)</button></p>
-                <p><button class="shop-btn" onclick="buyItem('sneakyFriend')">Sneaky Friend (40 coins)</button></p>
-                <p><button class="shop-btn" onclick="buyItem('speedBoost')">Speed Boost (30 coins)</button></p>
-                <p><button class="shop-btn" onclick="buyItem('stealthMode')">Stealth Mode (60 coins)</button></p>
-                <p><button class="shop-btn" onclick="buyItem('chaosMode')">Chaos Mode (90 coins)</button></p>
-                <button class="close-shop" onclick="closeShop()">Close</button>
+                <div class="shop-grid">
+                    <button class="shop-btn" onclick="buyItem('bribe')">Bribe a Senior (25🪙)</button>
+                    <button class="shop-btn" onclick="buyItem('emergency')">Fake Emergency (50🪙)</button>
+                    <button class="shop-btn" onclick="buyItem('stopWalter')">Buy Off Walter (75🪙)</button>
+                    <button class="shop-btn" onclick="buyItem('teacher')">This is for a Teacher (100🪙)</button>
+                    <button class="shop-btn" onclick="buyItem('lunchPass')">Lunch Pass (150🪙)</button>
+                    <button class="shop-btn" onclick="buyItem('securityBribe')">Security Bribe (80🪙)</button>
+                    <button class="shop-btn" onclick="buyItem('fakePass')">Fake Hall Pass (50🪙)</button>
+                    <button class="shop-btn" onclick="buyItem('sneakyFriend')">Sneaky Friend (40🪙)</button>
+                    <button class="shop-btn" onclick="buyItem('speedBoost')">Speed Boost (30🪙)</button>
+                    <button class="shop-btn" onclick="buyItem('stealthMode')">Stealth Mode (60🪙)</button>
+                    <button class="shop-btn" onclick="buyItem('chaosMode')">Chaos Mode (90🪙)</button>
+                </div>
+                <button class="close-shop" onclick="toggleShop()">Close</button>
             </div>
+
+            <!-- Purchase Notification -->
+            <div id="purchase-notification" style="display: none;">Purchase Successful!</div>
         </div>
     </div>
 
