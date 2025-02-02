@@ -8,6 +8,7 @@ let playerName = "";
 let gameMode = "normal";
 let moveCooldown = false;
 let cooldownTime = 3;
+let activeEffects = [];
 
 const events = [
     { text: "Sherand skips you! You move back a spot.", effect: 1 },
@@ -30,10 +31,10 @@ const shopItems = {
     teacher: { cost: 100, effect: "teacher", description: "Move to position 2 instantly!" },
     lunchPass: { cost: 150, effect: "front", description: "Skip to the front of the line!" },
     securityBribe: { cost: 80, effect: "blockSkips", description: "Prevents people from skipping you for 5 turns." },
-    fakePass: { cost: 50, effect: "fakePass", description: "Move forward 3 spots (50% chance), else move back 5 spots." },
+    fakePass: { cost: 50, effect: "fakePass", description: "50% chance to move forward 3 spots, else move back 5 spots." },
     sneakyFriend: { cost: 40, effect: -1, description: "Move forward 1 spot." },
     speedBoost: { cost: 30, effect: "doubleMove", description: "Move twice as fast for 3 turns." },
-    stealthMode: { cost: 60, effect: "stealth", description: "Avoid bad events for 2 turns." },
+    stealthMode: { cost: 60, effect: "stealth", description: "Avoid all negative events for 2 turns." },
     chaosMode: { cost: 90, effect: "chaos", description: "Reverse all events for 3 turns." }
 };
 
@@ -46,6 +47,7 @@ function startGame() {
     stamina = 5;
     gameOver = false;
     moveCooldown = false;
+    activeEffects = [];
 
     document.getElementById("start-screen").style.display = "none";
     document.getElementById("game-screen").style.display = "block";
@@ -109,12 +111,9 @@ function attemptMove() {
     }
 }
 
-function openShop() {
-    document.getElementById("shop").style.display = "block";
-}
-
-function closeShop() {
-    document.getElementById("shop").style.display = "none";
+function toggleShop() {
+    let shop = document.getElementById("shop");
+    shop.style.display = (shop.style.display === "none" || shop.style.display === "") ? "block" : "none";
 }
 
 function buyItem(item) {
@@ -123,7 +122,7 @@ function buyItem(item) {
     let itemData = shopItems[item];
 
     if (coins < itemData.cost) {
-        document.getElementById("event-log").innerText = "Not enough coins!";
+        showNotification("Not enough coins!", "red");
         return;
     }
 
@@ -147,23 +146,27 @@ function buyItem(item) {
                 position += 5;
             }
         } else if (itemData.effect === "doubleMove") {
-            position -= 2;
+            activeEffects.push("Speed Boost (3 turns)");
         } else if (itemData.effect === "stealth") {
-            moveCooldown = true;
-            setTimeout(() => moveCooldown = false, 6000);
+            activeEffects.push("Stealth Mode (2 turns)");
         } else if (itemData.effect === "chaos") {
             events = events.map(e => ({ ...e, effect: e.effect * -1 }));
+            activeEffects.push("Chaos Mode (3 turns)");
         }
     }
 
     if (position < 1) position = 1;
+
     updateUI();
+    showNotification(`Purchased: ${itemData.description}`, "green");
 }
 
-function giveUp() {
-    document.getElementById("story").innerText = "You gave up. Maybe next time!";
-    gameOver = true;
-    updateUI();
+function showNotification(message, color) {
+    let notification = document.getElementById("purchase-notification");
+    notification.innerText = message;
+    notification.style.background = color;
+    notification.style.display = "block";
+    setTimeout(() => { notification.style.display = "none"; }, 2000);
 }
 
 function updateUI() {
@@ -173,4 +176,7 @@ function updateUI() {
     document.getElementById("attempts").innerText = attempts;
     document.getElementById("wins").innerText = wins;
     document.getElementById("progress-bar").style.width = ((10 - position) / 10) * 100 + "%";
+    document.getElementById("effects-list").innerHTML = activeEffects.length > 0 
+        ? activeEffects.map(effect => `<li>${effect}</li>`).join("") 
+        : "<li>No active effects.</li>";
 }
