@@ -14,6 +14,15 @@
         <div id="start-screen">
             <p>Enter your name:</p>
             <input type="text" id="player-name" placeholder="Your Name">
+            
+            <p>Select Game Mode:</p>
+            <select id="game-mode">
+                <option value="normal" selected>Normal</option>
+                <option value="survival">Survival Mode</option>
+                <option value="team">Team Mode</option>
+                <option value="hardcore">Hardcore Mode</option>
+            </select>
+
             <p>Select Difficulty:</p>
             <select id="difficulty">
                 <option value="easy">Easy</option>
@@ -29,8 +38,22 @@
                 <p><strong>Name:</strong> <span id="display-name"></span></p>
                 <p><strong>Position:</strong> <span id="position">10</span></p>
                 <p><strong>Coins:</strong> <span id="coins">0</span></p>
+                <p><strong>Stamina:</strong> <span id="stamina">5</span></p>
                 <p><strong>Attempts:</strong> <span id="attempts">0</span></p>
                 <p><strong>Wins:</strong> <span id="wins">0</span></p>
+            </div>
+
+            <!-- Leaderboard -->
+            <div id="leaderboard">
+                <h2>Leaderboard</h2>
+                <table>
+                    <tr>
+                        <th>Player</th>
+                        <th>Wins</th>
+                        <th>Best Streak</th>
+                    </tr>
+                    <tbody id="leaderboard-body"></tbody>
+                </table>
             </div>
 
             <div class="progress-container">
@@ -49,9 +72,17 @@
             <!-- Shop System -->
             <div id="shop" style="display: none;">
                 <h2>Shop</h2>
-                <p><button class="shop-btn" onclick="buyItem('bribe')">Bribe a Senior (10 coins)</button></p>
-                <p><button class="shop-btn" onclick="buyItem('emergency')">Fake Emergency (15 coins)</button></p>
-                <p><button class="shop-btn" onclick="buyItem('stopWalter')">Buy Off Walter (20 coins)</button></p>
+                <p><button class="shop-btn" onclick="buyItem('bribe')">Bribe a Senior (25 coins)</button></p>
+                <p><button class="shop-btn" onclick="buyItem('emergency')">Fake Emergency (50 coins)</button></p>
+                <p><button class="shop-btn" onclick="buyItem('stopWalter')">Buy Off Walter (75 coins)</button></p>
+                <p><button class="shop-btn" onclick="buyItem('teacher')">This is for a teacher (100 coins)</button></p>
+                <p><button class="shop-btn" onclick="buyItem('lunchPass')">Lunch Pass (150 coins)</button></p>
+                <p><button class="shop-btn" onclick="buyItem('securityBribe')">Security Bribe (80 coins)</button></p>
+                <p><button class="shop-btn" onclick="buyItem('fakePass')">Fake Hall Pass (50 coins)</button></p>
+                <p><button class="shop-btn" onclick="buyItem('sneakyFriend')">Sneaky Friend (40 coins)</button></p>
+                <p><button class="shop-btn" onclick="buyItem('speedBoost')">Speed Boost (30 coins)</button></p>
+                <p><button class="shop-btn" onclick="buyItem('stealthMode')">Stealth Mode (60 coins)</button></p>
+                <p><button class="shop-btn" onclick="buyItem('chaosMode')">Chaos Mode (90 coins)</button></p>
                 <button class="close-shop" onclick="closeShop()">Close</button>
             </div>
         </div>

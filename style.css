@@ -33,6 +33,7 @@ h1 {
     border-radius: 10px;
     margin-bottom: 20px;
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-around;
     font-size: 14px;
 }
@@ -89,6 +90,7 @@ h1 {
     border-radius: 10px;
     font-size: 14px;
     min-height: 50px;
+    border: 2px solid #ffcc00;
 }
 
 /* Shop */
@@ -98,6 +100,8 @@ h1 {
     border-radius: 10px;
     display: none;
     margin-top: 20px;
+    border: 2px solid #00c3ff;
+    text-align: center;
 }
 
 .shop-btn, .close-shop {
@@ -110,9 +114,65 @@ h1 {
     border-radius: 8px;
     transition: transform 0.2s, box-shadow 0.2s;
     margin: 5px;
+    display: block;
+    width: 80%;
+    margin: 10px auto;
 }
 
 .shop-btn:hover, .close-shop:hover {
     transform: scale(1.1);
     box-shadow: 0px 0px 10px rgba(0, 195, 255, 0.8);
+}
+
+/* Stamina Indicator */
+#stamina {
+    color: #ffcc00;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+/* Leaderboard */
+#leaderboard {
+    background: rgba(0, 0, 0, 0.8);
+    padding: 10px;
+    border-radius: 10px;
+    margin-top: 20px;
+    border: 2px solid #00c3ff;
+    max-width: 90%;
+    margin: auto;
+}
+
+#leaderboard h2 {
+    color: #00c3ff;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+th, td {
+    border: 1px solid #00c3ff;
+    padding: 8px;
+}
+
+th {
+    background-color: #00c3ff;
+    color: black;
+}
+
+td {
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+/* Animations */
+@keyframes glow {
+    0% { box-shadow: 0px 0px 5px #ffcc00; }
+    50% { box-shadow: 0px 0px 20px #ffcc00; }
+    100% { box-shadow: 0px 0px 5px #ffcc00; }
+}
+
+.game-btn.glowing {
+    animation: glow 1.5s infinite alternate;
 }
