@@ -11,6 +11,8 @@ let cooldownTime = 3;
 let activeEffects = [];
 let leaderboard = JSON.parse(localStorage.getItem("leaderboard")) || [];
 
+const adminPassword = "Aquinas2024"; // Change this password for security.
+
 const events = [
     { text: "Sherand skips you! You move back a spot.", effect: 1 },
     { text: "Anthony skips you! You move back a spot.", effect: 1 },
@@ -115,47 +117,6 @@ function attemptMove() {
     }
 }
 
-function updateLeaderboard(name, winCount) {
-    let player = leaderboard.find(p => p.name === name);
-    if (player) {
-        player.wins++;
-        player.bestStreak = Math.max(player.bestStreak, player.wins);
-        player.attempts += attempts;
-    } else {
-        leaderboard.push({ name, wins: winCount, bestStreak: winCount, attempts });
-    }
-
-    leaderboard.sort((a, b) => b.wins - a.wins);
-    localStorage.setItem("leaderboard", JSON.stringify(leaderboard));
-    displayLeaderboard();
-}
-
-function displayLeaderboard() {
-    let leaderboardBody = document.getElementById("leaderboard-body");
-    leaderboardBody.innerHTML = "";
-    leaderboard.forEach(player => {
-        leaderboardBody.innerHTML += `<tr><td>${player.name}</td><td>${player.wins}</td><td>${player.bestStreak}</td><td>${player.attempts}</td></tr>`;
-    });
-}
-
-function savePlayerStats() {
-    localStorage.setItem(playerName, JSON.stringify({ wins, attempts }));
-}
-
-function loadPlayerStats() {
-    let savedStats = JSON.parse(localStorage.getItem(playerName));
-    if (savedStats) {
-        wins = savedStats.wins;
-        attempts = savedStats.attempts;
-    }
-    displayLeaderboard();
-}
-
-function toggleShop() {
-    let shop = document.getElementById("shop");
-    shop.style.display = (shop.style.display === "none" || shop.style.display === "") ? "block" : "none";
-}
-
 function buyItem(item) {
     if (!shopItems[item] || gameOver) return;
 
@@ -176,6 +137,13 @@ function buyItem(item) {
         position = 1;
     } else if (itemData.effect === "blockSkips") {
         events = events.filter(e => !e.text.includes("skips"));
+    } else if (itemData.effect === "doubleMove") {
+        activeEffects.push("Speed Boost (3 turns)");
+    } else if (itemData.effect === "stealth") {
+        activeEffects.push("Stealth Mode (2 turns)");
+    } else if (itemData.effect === "chaos") {
+        events = events.map(e => ({ ...e, effect: e.effect * -1 }));
+        activeEffects.push("Chaos Mode (3 turns)");
     }
 
     updateUI();
@@ -188,4 +156,44 @@ function showNotification(message, color) {
     notification.style.background = color;
     notification.style.display = "block";
     setTimeout(() => { notification.style.display = "none"; }, 2000);
+}
+
+function updateUI() {
+    document.getElementById("position").innerText = position;
+    document.getElementById("coins").innerText = coins;
+    document.getElementById("stamina").innerText = stamina;
+    document.getElementById("attempts").innerText = attempts;
+    document.getElementById("wins").innerText = wins;
+    document.getElementById("progress-bar").style.width = ((10 - position) / 10) * 100 + "%";
+}
+
+/* Admin Panel */
+function adminLogin() {
+    let password = prompt("Enter Admin Password:");
+    if (password === adminPassword) {
+        toggleAdminPanel();
+    } else {
+        alert("Incorrect password!");
+    }
+}
+
+function toggleAdminPanel() {
+    let panel = document.getElementById("admin-panel");
+    panel.style.display = (panel.style.display === "none" || panel.style.display === "") ? "block" : "none";
+}
+
+function addAdminCoins() {
+    let amount = parseInt(document.getElementById("admin-coins").value);
+    if (!isNaN(amount) && amount > 0) {
+        coins += amount;
+        updateUI();
+        showNotification(`Admin added ${amount} coins!`, "gold");
+    } else {
+        alert("Invalid amount!");
+    }
+}
+
+function toggleShop() {
+    let shop = document.getElementById("shop");
+    shop.style.display = (shop.style.display === "none" || shop.style.display === "") ? "block" : "none";
 }
