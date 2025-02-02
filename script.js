@@ -2,7 +2,7 @@ let position = 10;
 let coins = 0;
 let attempts = 0;
 let wins = 0;
-let stamina = 5; // Limits movement before resting
+let stamina = 5;
 let gameOver = false;
 let playerName = "";
 let gameMode = "normal";
@@ -16,7 +16,6 @@ const events = [
     { text: "Walter buys out the rest of the menu! You lose!", effect: "lose" },
     { text: "Fire Drill! Everyone goes back to their original positions!", effect: "reset" },
     { text: "Food Poisoning Scare! The line stops for 3 turns.", effect: "pause" },
-    { text: "The lunch price inflated mid-line. You hesitate...", effect: 0 },
     { text: "You found a shortcut! Move ahead 2 spots!", effect: -2 },
     { text: "You successfully move forward!", effect: -1 },
     { text: "A teacher calls you to help! You lose 3 spots!", effect: 3 },
@@ -24,7 +23,19 @@ const events = [
     { text: "A prefect catches you! You are sent to the back!", effect: 10 }
 ];
 
-const leaderboard = [];
+const shopItems = {
+    bribe: { cost: 25, effect: -2, description: "Move forward 2 spots." },
+    emergency: { cost: 50, effect: -5, description: "Move forward 5 spots." },
+    stopWalter: { cost: 75, effect: "removeWalter", description: "Stops Walter from buying all the food!" },
+    teacher: { cost: 100, effect: "teacher", description: "Move to position 2 instantly!" },
+    lunchPass: { cost: 150, effect: "front", description: "Skip to the front of the line!" },
+    securityBribe: { cost: 80, effect: "blockSkips", description: "Prevents people from skipping you for 5 turns." },
+    fakePass: { cost: 50, effect: "fakePass", description: "Move forward 3 spots (50% chance), else move back 5 spots." },
+    sneakyFriend: { cost: 40, effect: -1, description: "Move forward 1 spot." },
+    speedBoost: { cost: 30, effect: "doubleMove", description: "Move twice as fast for 3 turns." },
+    stealthMode: { cost: 60, effect: "stealth", description: "Avoid bad events for 2 turns." },
+    chaosMode: { cost: 90, effect: "chaos", description: "Reverse all events for 3 turns." }
+};
 
 function startGame() {
     playerName = document.getElementById("player-name").value || "Player";
@@ -93,30 +104,9 @@ function attemptMove() {
 
     if (position === 1) {
         wins++;
-        updateLeaderboard(playerName, wins);
         document.getElementById("story").innerText = playerName + " reached the front! You win!";
         gameOver = true;
     }
-}
-
-function updateLeaderboard(name, winCount) {
-    let player = leaderboard.find(p => p.name === name);
-    if (player) {
-        player.wins++;
-    } else {
-        leaderboard.push({ name, wins: winCount });
-    }
-
-    leaderboard.sort((a, b) => b.wins - a.wins);
-    displayLeaderboard();
-}
-
-function displayLeaderboard() {
-    let leaderboardBody = document.getElementById("leaderboard-body");
-    leaderboardBody.innerHTML = "";
-    leaderboard.forEach(player => {
-        leaderboardBody.innerHTML += `<tr><td>${player.name}</td><td>${player.wins}</td></tr>`;
-    });
 }
 
 function openShop() {
@@ -128,49 +118,42 @@ function closeShop() {
 }
 
 function buyItem(item) {
-    if (moveCooldown) return;
+    if (moveCooldown || !shopItems[item]) return;
 
-    if (item === "bribe" && coins >= 25) {
-        position -= 2;
-        coins -= 25;
-    } else if (item === "emergency" && coins >= 50) {
-        position -= 5;
-        coins -= 50;
-    } else if (item === "stopWalter" && coins >= 75) {
-        events.splice(events.findIndex(e => e.text.includes("Walter buys")), 1);
-        coins -= 75;
-    } else if (item === "teacher" && coins >= 100) {
-        position = 2;
-        coins -= 100;
-    } else if (item === "lunchPass" && coins >= 150) {
-        position = 1;
-        coins -= 150;
-    } else if (item === "securityBribe" && coins >= 80) {
-        events = events.filter(e => !e.text.includes("skips"));
-        coins -= 80;
-    } else if (item === "fakePass" && coins >= 50) {
-        if (Math.random() < 0.5) {
-            position -= 3;
-        } else {
-            position += 5;
-        }
-        coins -= 50;
-    } else if (item === "sneakyFriend" && coins >= 40) {
-        position -= 1;
-        coins -= 40;
-    } else if (item === "speedBoost" && coins >= 30) {
-        position -= 2;
-        coins -= 30;
-    } else if (item === "stealthMode" && coins >= 60) {
-        moveCooldown = true;
-        setTimeout(() => moveCooldown = false, 6000);
-        coins -= 60;
-    } else if (item === "chaosMode" && coins >= 90) {
-        events = events.map(e => ({ ...e, effect: e.effect * -1 }));
-        coins -= 90;
-    } else {
+    let itemData = shopItems[item];
+
+    if (coins < itemData.cost) {
         document.getElementById("event-log").innerText = "Not enough coins!";
         return;
+    }
+
+    coins -= itemData.cost;
+
+    if (typeof itemData.effect === "number") {
+        position += itemData.effect;
+    } else {
+        if (itemData.effect === "removeWalter") {
+            events = events.filter(e => !e.text.includes("Walter buys"));
+        } else if (itemData.effect === "teacher") {
+            position = 2;
+        } else if (itemData.effect === "front") {
+            position = 1;
+        } else if (itemData.effect === "blockSkips") {
+            events = events.filter(e => !e.text.includes("skips"));
+        } else if (itemData.effect === "fakePass") {
+            if (Math.random() < 0.5) {
+                position -= 3;
+            } else {
+                position += 5;
+            }
+        } else if (itemData.effect === "doubleMove") {
+            position -= 2;
+        } else if (itemData.effect === "stealth") {
+            moveCooldown = true;
+            setTimeout(() => moveCooldown = false, 6000);
+        } else if (itemData.effect === "chaos") {
+            events = events.map(e => ({ ...e, effect: e.effect * -1 }));
+        }
     }
 
     if (position < 1) position = 1;
