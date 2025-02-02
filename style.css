@@ -104,6 +104,15 @@ h1 {
     text-align: center;
 }
 
+/* Shop Grid Layout */
+.shop-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    padding: 10px;
+}
+
+/* Shop Buttons */
 .shop-btn, .close-shop {
     background: linear-gradient(135deg, #008cba, #00c3ff);
     color: white;
@@ -113,10 +122,6 @@ h1 {
     font-size: 14px;
     border-radius: 8px;
     transition: transform 0.2s, box-shadow 0.2s;
-    margin: 5px;
-    display: block;
-    width: 80%;
-    margin: 10px auto;
 }
 
 .shop-btn:hover, .close-shop:hover {
@@ -124,46 +129,49 @@ h1 {
     box-shadow: 0px 0px 10px rgba(0, 195, 255, 0.8);
 }
 
-/* Stamina Indicator */
-#stamina {
-    color: #ffcc00;
-    font-weight: bold;
-    font-size: 16px;
-}
-
-/* Leaderboard */
-#leaderboard {
-    background: rgba(0, 0, 0, 0.8);
-    padding: 10px;
+/* Active Effects Panel */
+#status-effects {
+    background: rgba(0, 0, 0, 0.85);
+    padding: 15px;
     border-radius: 10px;
     margin-top: 20px;
-    border: 2px solid #00c3ff;
-    max-width: 90%;
+    border: 2px solid #ffcc00;
+    text-align: center;
+    max-width: 80%;
     margin: auto;
 }
 
-#leaderboard h2 {
-    color: #00c3ff;
+#status-effects h2 {
+    color: #ffcc00;
 }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
+#effects-list {
+    list-style-type: none;
+    padding: 0;
 }
 
-th, td {
-    border: 1px solid #00c3ff;
+#effects-list li {
+    background: rgba(255, 200, 0, 0.3);
     padding: 8px;
+    margin: 5px 0;
+    border-radius: 8px;
+    font-size: 14px;
 }
 
-th {
-    background-color: #00c3ff;
+/* Purchase Notification */
+#purchase-notification {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #00ff00;
     color: black;
-}
-
-td {
-    background-color: rgba(0, 0, 0, 0.7);
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: bold;
+    display: none;
+    box-shadow: 0px 0px 10px rgba(0, 255, 0, 0.8);
 }
 
 /* Animations */
