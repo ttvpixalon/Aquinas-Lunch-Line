@@ -25,6 +25,20 @@ const events = [
     { text: "A prefect catches you! You are sent to the back!", effect: 10 }
 ];
 
+const shopItems = {
+    bribe: { cost: 25, effect: -2, description: "Move forward 2 spots." },
+    emergency: { cost: 50, effect: -5, description: "Move forward 5 spots." },
+    stopWalter: { cost: 75, effect: "removeWalter", description: "Stops Walter from buying all the food!" },
+    teacher: { cost: 100, effect: "teacher", description: "Move to position 2 instantly!" },
+    lunchPass: { cost: 150, effect: "front", description: "Skip to the front of the line!" },
+    securityBribe: { cost: 80, effect: "blockSkips", description: "Prevents people from skipping you for 5 turns." },
+    fakePass: { cost: 50, effect: "fakePass", description: "50% chance to move forward 3 spots, else move back 5 spots." },
+    sneakyFriend: { cost: 40, effect: -1, description: "Move forward 1 spot." },
+    speedBoost: { cost: 30, effect: "doubleMove", description: "Move twice as fast for 3 turns." },
+    stealthMode: { cost: 60, effect: "stealth", description: "Avoid all negative events for 2 turns." },
+    chaosMode: { cost: 90, effect: "chaos", description: "Reverse all events for 3 turns." }
+};
+
 function startGame() {
     playerName = document.getElementById("player-name").value || "Player";
     gameMode = document.getElementById("game-mode").value;
@@ -137,23 +151,13 @@ function loadPlayerStats() {
     displayLeaderboard();
 }
 
-function updateUI() {
-    document.getElementById("position").innerText = position;
-    document.getElementById("coins").innerText = coins;
-    document.getElementById("stamina").innerText = stamina;
-    document.getElementById("attempts").innerText = attempts;
-    document.getElementById("wins").innerText = wins;
-    document.getElementById("progress-bar").style.width = ((10 - position) / 10) * 100 + "%";
-}
-
-/* SHOP SYSTEM */
 function toggleShop() {
     let shop = document.getElementById("shop");
     shop.style.display = (shop.style.display === "none" || shop.style.display === "") ? "block" : "none";
 }
 
 function buyItem(item) {
-    if (!shopItems[item]) return;
+    if (!shopItems[item] || gameOver) return;
 
     let itemData = shopItems[item];
 
@@ -172,17 +176,12 @@ function buyItem(item) {
         position = 1;
     } else if (itemData.effect === "blockSkips") {
         events = events.filter(e => !e.text.includes("skips"));
-    } else if (itemData.effect === "doubleMove") {
-        activeEffects.push("Speed Boost (3 turns)");
-    } else if (itemData.effect === "stealth") {
-        activeEffects.push("Stealth Mode (2 turns)");
     }
 
     updateUI();
     showNotification(`Purchased: ${itemData.description}`, "green");
 }
 
-/* NOTIFICATIONS */
 function showNotification(message, color) {
     let notification = document.getElementById("purchase-notification");
     notification.innerText = message;
