@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aquinas Lunch Line Challenge</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="game-container">
+        <h1>Aquinas College Lunch Line Challenge</h1>
+
+        <!-- Start Screen -->
+        <div id="start-screen">
+            <p>Enter your name:</p>
+            <input type="text" id="player-name" placeholder="Your Name">
+            <p>Select Difficulty:</p>
+            <select id="difficulty">
+                <option value="easy">Easy</option>
+                <option value="normal" selected>Normal</option>
+                <option value="hard">Hard</option>
+            </select>
+            <button onclick="startGame()">Start Game</button>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="game-screen" style="display: none;">
+            <div class="stats">
+                <p><strong>Name:</strong> <span id="display-name"></span></p>
+                <p><strong>Position:</strong> <span id="position">10</span></p>
+                <p><strong>Coins:</strong> <span id="coins">0</span></p>
+                <p><strong>Attempts:</strong> <span id="attempts">0</span></p>
+                <p><strong>Wins:</strong> <span id="wins">0</span></p>
+            </div>
+
+            <div class="progress-container">
+                <div id="progress-bar"></div>
+            </div>
+
+            <p id="story">You are at the back of the line (Position 10). Try to move forward!</p>
+            <p id="event-log"></p>
+
+            <div id="choices">
+                <button class="game-btn" onclick="attemptMove()">Move Forward</button>
+                <button class="game-btn" onclick="openShop()">Shop</button>
+                <button class="game-btn give-up" onclick="giveUp()">Give Up</button>
+            </div>
+
+            <!-- Shop System -->
+            <div id="shop" style="display: none;">
+                <h2>Shop</h2>
+                <p><button class="shop-btn" onclick="buyItem('bribe')">Bribe a Senior (10 coins)</button></p>
+                <p><button class="shop-btn" onclick="buyItem('emergency')">Fake Emergency (15 coins)</button></p>
+                <p><button class="shop-btn" onclick="buyItem('stopWalter')">Buy Off Walter (20 coins)</button></p>
+                <button class="close-shop" onclick="closeShop()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
